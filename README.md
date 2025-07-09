@@ -4,6 +4,9 @@
 
 **Saqara Keycloak Browser Companion** is a Chrome and Firefox extension that enhances the Keycloak admin UI for administrators and support teams. It was created in response to the upgrade from Keycloak 16 to Keycloak 25, which removed the original "Impersonate" button from the users table. This extension restores and improves that functionality, making user impersonation easy and accessible again. It also suggests realm switching when relevant and supports multiple Keycloak environments. The extension is easy to install manually and requires no developer skills.
 
+![Extension in Chrome list](./.github/image-1.png)
+![Impersonate button](./.github/image-2.png)
+
 ## Features
 
 - **One-click user impersonation**: Instantly impersonate any user directly from the users table.
@@ -18,19 +21,21 @@
 
 > **Note:** This extension should work on any Chrome-based browser such as Arc, Edge, Brave, etc.
 
-1. Download or clone this repository. The latest version is available on [the releases page](https://github.com/saqara/keycloak-browser-companion/releases).
-2. Open Chrome and go to [`chrome://extensions/`](chrome://extensions/).
-3. Enable Developer mode (top right corner).
-4. Click "Load unpacked"/"Charger une extension non empaquetée" and select the `src` folder.
-5. The extension icon should appear in the Chrome toolbar.
+1. Clone or [download this repository](https://github.com/saqara/keycloak-browser-companion/archive/refs/heads/main.zip).
+2. Unzip the downloaded file if necessary.
+3. Open Chrome and go to [`chrome://extensions/`](chrome://extensions/).
+4. Enable Developer mode (top right corner).
+5. Click "Load unpacked"/"Charger une extension non empaquetée" and select the `src` folder.
+6. The extension icon should appear in the Chrome toolbar.
 
 ### Firefox
 
-1. Download or clone this repository. The latest version is available on [the releases page](https://github.com/saqara/keycloak-browser-companion/releases).
-2. Open Firefox and go to [`about:debugging#/runtime/this-firefox`](about:debugging#/runtime/this-firefox).
-3. Click "Load Temporary Add-on"/"Charger un module complémentaire temporaire".
-4. Select the `manifest.json` file inside the `src` folder.
-5. The extension icon should appear in the Firefox toolbar.
+1. Clone or [download this repository](https://github.com/saqara/keycloak-browser-companion/archive/refs/heads/main.zip).
+2. Unzip the downloaded file if necessary.
+3. Open Firefox and go to [`about:debugging#/runtime/this-firefox`](about:debugging#/runtime/this-firefox).
+4. Click "Load Temporary Add-on"/"Charger un module complémentaire temporaire".
+5. Select the `manifest.json` file inside the `src` folder.
+6. The extension icon should appear in the Firefox toolbar.
 
 > **Note:** For permanent installation on Firefox, the extension must be published on the Firefox Add-ons Store. This guide covers manual installation for development and internal use.
 
@@ -55,3 +60,11 @@
 
 - If the extension icon does not appear or features do not work, check the browser console (F12) for errors.
 - Ensure you are using a supported version of Chrome or Firefox (Firefox 109+ required for Manifest v3).
+
+## Notes for Developers
+
+- The extension is built using Manifest v3, which is the latest standard for Chrome extensions.
+- This extension does not require any backend server or API; it operates entirely within the browser.
+- You can modify the source files in the `src` directory. Before pushing changes, run the linter to ensure code quality:
+
+  > **Warning:** If you forget to run the linter, the CI will catch you faster than you can say `npm run lint`! 🚨
