@@ -1,0 +1,44 @@
+name: Pull Requests - CI Linting
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - /**
+      - .github/workflows/pullrequest-eslint.yaml
+  pull_request:
+    types: [opened, synchronize, edited, labeled]
+    paths:
+      - /**
+      - .github/workflows/pullrequest-eslint.yaml
+
+jobs:
+  eslint:
+    name: ESLint
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ./node_modules
+          key: npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: npm-
+
+      - name: Set up npm with GitHub Packages
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GH_PACKAGES_TOKEN }}" > ~/.npmrc
+          echo "@saqara:registry=https://npm.pkg.github.com" >> ~/.npmrc
+
+      - name: Install npm dependencies
+        run: |
+          npm ci \
+            --legacy-peer-deps
+
+      - name: Run ESLint
+        run: |
+          npm run lint-ci
