@@ -9,7 +9,7 @@
 
 ## Features
 
-- **One-click user impersonation**: Instantly impersonate any user directly from the users table.
+- **One-click user impersonation**: Instantly impersonate any user directly from the users table, and injects an "Impersonate" button next to the user details page header.
 - **Automatic realm switch suggestion**: If only two realms are available and you are on the default realm (usually "master"), the extension offers to switch to the other realm for a smoother admin experience.
 - **Multi-environment support**: Works on all Keycloak admin URLs (staging, demo, preproduction, local, etc.).
 - **Works on Chrome and Firefox**: Compatible with Manifest v3 and tested on both browsers.
@@ -52,7 +52,7 @@
 |---------------|-----------------------------------------------|
 | Development   | <http://keycloak:10000/>                      |
 | Staging       | <https://account.staging.saqara.com/>         |
-| Préproduction | <https://account.preproduction.saqara.com/>   |
+| Preproduction | <https://account.preproduction.saqara.com/>   |
 | Demo          | <https://account.demo.go-aos.io/>             |
 | Production    | <https://account.go-aos.io/>                  |
 
