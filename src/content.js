@@ -43,29 +43,11 @@ function addImpersonateLink() {
         alert('Bearer token not available. Please try again later.')
         return
       }
-      const impersonationUrl = `/auth/admin/realms/${realm}/users/${uuid}/impersonation`
-      const payload = { user: uuid, realm: realm }
-      try {
-        const response = await fetch(impersonationUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + bearerToken,
-          },
-          body: JSON.stringify(payload),
-        })
-        if (!response.ok) {
-          alert('Failed to impersonate.')
-          return
-        }
-        const data = await response.json()
-        if (data.redirect) {
-          window.open(data.redirect, '_blank')
-        } else {
-          alert('Impersonation succeeded, but no redirect URL was provided.')
-        }
-      } catch (error) {
-        alert('An error occurred during impersonation.')
+      const redirectUrl = await impersonateUser(realm, uuid, bearerToken)
+      if (redirectUrl) {
+        window.open(redirectUrl, '_blank')
+      } else {
+        alert('Failed to impersonate or no redirect URL was provided.')
       }
     })
     impersonateCell.appendChild(impersonateLink)
@@ -166,10 +148,98 @@ async function checkAndSuggestRealmSwitch() {
   }
 }
 
+/**
+ * Performs a user impersonation request to the Keycloak admin API.
+ *
+ * @async
+ * @function impersonateUser
+ * @param {string} realm - The realm name.
+ * @param {string} uuid - The user ID to impersonate.
+ * @param {string} bearerToken - The Keycloak access token.
+ * @returns {Promise<string|null>} The redirect URL if successful, null otherwise.
+ */
+async function impersonateUser(realm, uuid, bearerToken) {
+  const impersonationUrl = `/auth/admin/realms/${realm}/users/${uuid}/impersonation`
+  const payload = { user: uuid, realm: realm }
+  try {
+    const response = await fetch(impersonationUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + bearerToken,
+      },
+      body: JSON.stringify(payload),
+    })
+    if (!response.ok) {
+      return null
+    }
+    const data = await response.json()
+    return data.redirect || null
+  } catch (error) {
+    return null
+  }
+}
+
+/**
+ * Injects a button next to the user details page header if the header is found.
+ *
+ * @function injectButtonNextToHeader
+ * @returns {void}
+ */
+function injectButtonNextToHeader(headerElement) {
+  if (!headerElement) {
+    return
+  }
+
+  const button = document.createElement('button')
+  button.className = 'pf-m-secondary'
+  button.textContent = 'Impersonate'
+
+  button.addEventListener('click', async () => {
+    if (!bearerToken) {
+      alert('Bearer token not available. Please try again later.')
+      return
+    }
+
+    // Extract realm and user ID from the URL
+    const urlMatch = window.location.href.match(/#\/(.+?)\/users\/(.+?)\/settings/)
+    if (!urlMatch) {
+      alert('Failed to extract user ID or realm from the URL.')
+      return
+    }
+
+    const realm = urlMatch[1]
+    const userId = urlMatch[2]
+
+    const redirectUrl = await impersonateUser(realm, userId, bearerToken)
+    if (redirectUrl) {
+      window.open(redirectUrl, '_blank')
+    } else {
+      alert('Failed to impersonate or no redirect URL was provided.')
+    }
+  })
+
+  // Insert the button next to the header element
+  headerElement.parentNode.insertBefore(button, headerElement.nextSibling)
+}
+
+function observeHeaderForInjection() {
+  const observer = new MutationObserver(() => {
+    const headerElement = document.querySelector('h1.kc-username-view-header')
+    if (headerElement && !headerElement.dataset.buttonInjected) {
+      injectButtonNextToHeader(headerElement)
+      headerElement.dataset.buttonInjected = 'true' // Mark the header to avoid duplicate buttons
+    }
+  })
+
+  observer.observe(document.body, { childList: true, subtree: true })
+}
+
 // Initialize the script when the window loads
 window.addEventListener('load', () => {
   injectXHRInspector()
   observeUserTable()
+  observeHeaderForInjection()
 })
 
 // Listen for messages from the injected script to capture the bearer token
