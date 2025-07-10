@@ -43,29 +43,11 @@ function addImpersonateLink() {
         alert('Bearer token not available. Please try again later.')
         return
       }
-      const impersonationUrl = `/auth/admin/realms/${realm}/users/${uuid}/impersonation`
-      const payload = { user: uuid, realm: realm }
-      try {
-        const response = await fetch(impersonationUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + bearerToken,
-          },
-          body: JSON.stringify(payload),
-        })
-        if (!response.ok) {
-          alert('Failed to impersonate.')
-          return
-        }
-        const data = await response.json()
-        if (data.redirect) {
-          window.open(data.redirect, '_blank')
-        } else {
-          alert('Impersonation succeeded, but no redirect URL was provided.')
-        }
-      } catch (error) {
-        alert('An error occurred during impersonation.')
+      const redirectUrl = await impersonateUser(realm, uuid, bearerToken)
+      if (redirectUrl) {
+        window.open(redirectUrl, '_blank')
+      } else {
+        alert('Failed to impersonate or no redirect URL was provided.')
       }
     })
     impersonateCell.appendChild(impersonateLink)
@@ -163,6 +145,38 @@ async function checkAndSuggestRealmSwitch() {
     }
   } catch (e) {
     // Silent fail
+  }
+}
+
+/**
+ * Performs a user impersonation request to the Keycloak admin API.
+ *
+ * @async
+ * @function impersonateUser
+ * @param {string} realm - The realm name.
+ * @param {string} uuid - The user ID to impersonate.
+ * @param {string} bearerToken - The Keycloak access token.
+ * @returns {Promise<string|null>} The redirect URL if successful, null otherwise.
+ */
+async function impersonateUser(realm, uuid, bearerToken) {
+  const impersonationUrl = `/auth/admin/realms/${realm}/users/${uuid}/impersonation`
+  const payload = { user: uuid, realm: realm }
+  try {
+    const response = await fetch(impersonationUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + bearerToken,
+      },
+      body: JSON.stringify(payload),
+    })
+    if (!response.ok) {
+      return null
+    }
+    const data = await response.json()
+    return data.redirect || null
+  } catch (error) {
+    return null
   }
 }
 
