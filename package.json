@@ -1,6 +1,6 @@
 {
-  "name": "saqara-keycloak-browser-companion",
-  "version": "1.1.0",
+  "name": "saqara-browser-companion",
+  "version": "1.2.0",
   "type": "module",
   "scripts": {
     "lint": "eslint . --ext .js,.mjs,.cjs --ignore-path .gitignore --fix",

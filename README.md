@@ -1,17 +1,24 @@
-# Saqara Keycloak Browser Companion
+# Saqara Browser Companion
 
 ## Overview
 
-**Saqara Keycloak Browser Companion** is a Chrome and Firefox extension that enhances the Keycloak admin UI for administrators and support teams. It was created in response to the upgrade from Keycloak 16 to Keycloak 25, which removed the original "Impersonate" button from the users table. This extension restores and improves that functionality, making user impersonation easy and accessible again. It also suggests realm switching when relevant and supports multiple Keycloak environments. The extension is easy to install manually and requires no developer skills.
+**Saqara Browser Companion** is a Chrome and Firefox extension that :
+
+- Enhances the Keycloak admin UI for administrators and support teams. It was created in response to the upgrade from Keycloak 16 to Keycloak 25, which removed the original "Impersonate" button from the users table. This extension restores and improves that functionality, making user impersonation easy and accessible again. It also suggests realm switching when relevant and supports multiple Keycloak environments.
+- Enables one-click Bearer token copying from the AOS interface for easier API testing and integration.
+
+The extension is easy to install manually and requires no developer skills.
 
 ![Extension in Chrome list](./.github/image-1.png)
 ![Impersonate button](./.github/image-2.png)
+![Bearer Token Copy Button](./.github/image-3.png)
 
 ## Features
 
 - **One-click user impersonation**: Instantly impersonate any user directly from the users table, and injects an "Impersonate" button next to the user details page header.
 - **Automatic realm switch suggestion**: If only two realms are available and you are on the default realm (usually "master"), the extension offers to switch to the other realm for a smoother admin experience.
-- **Multi-environment support**: Works on all Keycloak admin URLs (staging, demo, preproduction, local, etc.).
+- **Multi-environment support**: Works on all Keycloak admin URLs and AOS environments.
+- **Bearer token copy button**: Adds a convenient button to copy the Bearer token from the AOS interface for easy API testing.
 - **Works on Chrome and Firefox**: Compatible with Manifest v3 and tested on both browsers.
 - **No sensitive data stored**: The extension does not store or transmit any personal or sensitive data.
 
@@ -55,6 +62,14 @@
 | Preproduction | <https://account.preproduction.saqara.com/>   |
 | Demo          | <https://account.demo.go-aos.io/>             |
 | Production    | <https://account.go-aos.io/>                  |
+
+### Supported AOS URLs
+
+| Environment   | URL                                           |
+|---------------|-----------------------------------------------|
+| Staging       | <https://app.staging.saqara.com/>             |
+| Preproduction | <https://app.preproduction.saqara.com/>       |
+| Production    | <https://app.saqara.com/>                     |
 
 ## Troubleshooting
 

@@ -1,4 +1,16 @@
 var bearerToken = null
+var saqaraBearerToken = null
+var saqaraModalEl = null
+
+/**
+ * Checks whether the current host matches the Saqara app domains.
+ *
+ * @function isSaqaraAppHost
+ * @returns {boolean} True when running on a Saqara app host.
+ */
+function isSaqaraAppHost() {
+  return /^(app\.(staging|preproduction)\.saqara\.com|app\.saqara\.com)$/i.test(window.location.hostname)
+}
 
 /**
  * Adds an "Impersonate" link to each user row in the Keycloak admin Users table.
@@ -87,6 +99,125 @@ function injectXHRInspector() {
 }
 
 /**
+ * Creates a compact snackbar-style notification to copy the bearer.
+ *
+ * @function ensureSaqaraBearerModal
+ * @returns {void}
+ */
+function ensureSaqaraBearerModal() {
+  if (!isSaqaraAppHost()) return
+  if (saqaraModalEl) return
+
+  const snackbar = document.createElement('div')
+  snackbar.style.position = 'fixed'
+  snackbar.style.right = '16px'
+  snackbar.style.top = '16px'
+  snackbar.style.zIndex = '2147483647'
+  snackbar.style.display = 'none'
+
+  const inner = document.createElement('div')
+  inner.setAttribute('role', 'alertdialog')
+  inner.style.transform = 'translate(0px, 0px)'
+  inner.style.transition = 'transform 225ms cubic-bezier(0, 0, 0.2, 1)'
+  inner.style.background = '#393C44'
+  inner.style.color = '#FAFAFA'
+  inner.style.padding = '6px 8px'
+  inner.style.borderRadius = '8px'
+  inner.style.boxShadow = '0 10px 25px rgba(0,0,0,0.25)'
+  inner.style.fontFamily = 'Inter, system-ui, -apple-system, sans-serif'
+  inner.style.fontSize = '11px'
+  inner.style.maxWidth = 'none'
+
+  const content = document.createElement('div')
+  content.style.display = 'flex'
+  content.style.alignItems = 'center'
+  content.style.gap = '8px'
+
+  const title = document.createElement('div')
+  title.textContent = 'Copier le bearer'
+  title.style.fontWeight = '500'
+  title.style.marginBottom = '0'
+  title.style.whiteSpace = 'nowrap'
+
+  const actions = document.createElement('div')
+  actions.style.display = 'flex'
+  actions.style.alignItems = 'center'
+  actions.style.gap = '6px'
+
+  const copyBtn = document.createElement('button')
+  copyBtn.setAttribute('aria-label', 'Copier le bearer')
+  copyBtn.style.background = 'transparent'
+  copyBtn.style.border = '1px solid rgba(250,250,250,0.3)'
+  copyBtn.style.color = '#FAFAFA'
+  copyBtn.style.padding = '4px'
+  copyBtn.style.borderRadius = '6px'
+  copyBtn.style.cursor = 'pointer'
+
+  const copyIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  copyIcon.setAttribute('width', '16')
+  copyIcon.setAttribute('height', '16')
+  copyIcon.setAttribute('viewBox', '0 0 24 24')
+  copyIcon.setAttribute('fill', 'none')
+  copyIcon.setAttribute('stroke', 'currentColor')
+  copyIcon.setAttribute('stroke-width', '1.8')
+  copyIcon.setAttribute('stroke-linecap', 'round')
+  copyIcon.setAttribute('stroke-linejoin', 'round')
+
+  const copyPath1 = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+  copyPath1.setAttribute('x', '9')
+  copyPath1.setAttribute('y', '9')
+  copyPath1.setAttribute('width', '11')
+  copyPath1.setAttribute('height', '11')
+  copyPath1.setAttribute('rx', '2')
+  copyPath1.setAttribute('ry', '2')
+
+  const copyPath2 = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  copyPath2.setAttribute('d', 'M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1')
+
+  copyIcon.append(copyPath1, copyPath2)
+  copyBtn.appendChild(copyIcon)
+
+  const status = document.createElement('span')
+  status.style.fontSize = '10px'
+  status.style.opacity = '0.7'
+  status.style.whiteSpace = 'nowrap'
+
+  copyBtn.addEventListener('click', async () => {
+    if (!saqaraBearerToken) return
+    try {
+      await navigator.clipboard.writeText(saqaraBearerToken)
+      status.textContent = 'Copié'
+      setTimeout(() => { status.textContent = '' }, 2000)
+    } catch {
+      status.textContent = 'Échec de copie'
+      setTimeout(() => { status.textContent = '' }, 2000)
+    }
+  })
+
+  actions.append(copyBtn, status)
+  content.append(title, actions)
+  inner.appendChild(content)
+  snackbar.appendChild(inner)
+  document.body.appendChild(snackbar)
+
+  saqaraModalEl = snackbar
+}
+
+/**
+ * Displays the Saqara bearer notification if available.
+ *
+ * @function showSaqaraBearerModal
+ * @returns {void}
+ */
+function showSaqaraBearerModal() {
+  if (!isSaqaraAppHost()) return
+  ensureSaqaraBearerModal()
+  if (!saqaraModalEl) return
+
+  saqaraModalEl.style.display = 'block'
+}
+
+/**
  * Asynchronously monitors the Keycloak admin UI for the current realm, and if running under
  * the "master" realm with a valid bearer token, fetches the list of available realms to
  * suggest switching to the other realm when exactly two are present.
@@ -108,6 +239,8 @@ function injectXHRInspector() {
  * @global {string} bearerToken  A valid Keycloak access token, expected to be defined in the global scope.
  */
 async function checkAndSuggestRealmSwitch() {
+  if (isSaqaraAppHost()) return
+
   // Wait for the current realm span to be present
   const waitForCurrentRealm = () => new Promise(resolve => {
     const tryFind = () => {
@@ -238,16 +371,25 @@ function observeHeaderForInjection() {
 // Initialize the script when the window loads
 window.addEventListener('load', () => {
   injectXHRInspector()
-  observeUserTable()
-  observeHeaderForInjection()
+  if (!isSaqaraAppHost()) {
+    observeUserTable()
+    observeHeaderForInjection()
+  }
 })
 
 // Listen for messages from the injected script to capture the bearer token
 window.addEventListener('message', (event) => {
   if (event.source !== window) return
-  if (event.data && event.data.type === 'BEARER_TOKEN') {
+  if (!event.data) return
+
+  if (event.data.type === 'BEARER_TOKEN') {
     bearerToken = event.data.token
     console.log('[content.js] Bearer token received')
     checkAndSuggestRealmSwitch()
+  }
+
+  if (event.data.type === 'SAQARA_GRAPHQL_AUTH') {
+    saqaraBearerToken = event.data.token
+    showSaqaraBearerModal()
   }
 })
