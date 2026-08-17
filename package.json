@@ -1,6 +1,6 @@
 {
   "name": "saqara-browser-companion",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "type": "module",
   "scripts": {
     "lint": "eslint . --ext .js,.mjs,.cjs --ignore-path .gitignore --fix",
