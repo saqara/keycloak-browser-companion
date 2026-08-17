@@ -1,29 +1,23 @@
 {
   "manifest_version": 3,
   "name": "Saqara Browser Companion",
-  "version": "1.2.0",
-  "description": "Ajoute un lien \"Impersonate\" dans le tableau des utilisateurs Keycloak et propose de basculer automatiquement vers le bon realm si besoin. Propose de copier le Bearer Token sur AOS. Extension multi-navigateurs et multi-environnements.",
+  "version": "1.2.1",
+  "description": "Adds an \"Impersonate\" link to the Keycloak users table and suggests switching realms when appropriate. Also provides a bearer token copy button on AOS. Multi-browser and multi-environment extension.",
   "author": "Simon Rubuano <simon@rubuano.dev>",
   "host_permissions": [
-    "https://account.demo.go-aos.io/*",
-    "https://account.preproduction.saqara.com/*",
-    "https://account.go-aos.io/*",
-    "https://account.staging.saqara.com/*",
-    "https://app.staging.saqara.com/*",
-    "https://app.preproduction.saqara.com/*",
-    "https://app.saqara.com/*",
+    "https://*.saqara.com/*",
+    "https://saqara.com/*",
+    "https://*.go-aos.io/*",
+    "https://go-aos.io/*",
     "http://keycloak:10000/*"
   ],
   "content_scripts": [
     {
       "matches": [
-        "https://account.demo.go-aos.io/*",
-        "https://account.preproduction.saqara.com/*",
-        "https://account.go-aos.io/*",
-        "https://account.staging.saqara.com/*",
-        "https://app.staging.saqara.com/*",
-        "https://app.preproduction.saqara.com/*",
-        "https://app.saqara.com/*",
+        "https://*.saqara.com/*",
+        "https://saqara.com/*",
+        "https://*.go-aos.io/*",
+        "https://go-aos.io/*",
         "http://keycloak:10000/*"
       ],
       "js": [
