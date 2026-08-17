@@ -65,11 +65,15 @@ The extension is easy to install manually and requires no developer skills.
 
 ### Supported AOS URLs
 
-| Environment   | URL                                           |
+The extension detects AOS hosts under both `saqara.com` and `go-aos.io` (all subdomains). This means the bearer-copy UI will appear on production, staging, preproduction and demo hosts for these domains.
+
+Examples:
+
+| Environment   | Example hosts                                 |
 |---------------|-----------------------------------------------|
 | Staging       | <https://app.staging.saqara.com/>             |
 | Preproduction | <https://app.preproduction.saqara.com/>       |
-| Production    | <https://app.saqara.com/>                     |
+| Production    | <https://app.saqara.com/>, <https://app.go-aos.io/>, <https://www.go-aos.io/> |
 
 ## Troubleshooting
 
