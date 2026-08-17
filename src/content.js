@@ -9,7 +9,8 @@ var saqaraModalEl = null
  * @returns {boolean} True when running on a Saqara app host.
  */
 function isSaqaraAppHost() {
-  return /^(app\.(staging|preproduction)\.saqara\.com|app\.saqara\.com)$/i.test(window.location.hostname)
+  // Match any subdomain of saqara.com or go-aos.io (production, staging, preproduction, demo, etc.)
+  return /(?:^|\.)((?:saqara\.com)|(?:go-aos\.io))$/i.test(window.location.hostname)
 }
 
 /**
